@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -7,29 +8,30 @@ namespace GameSimon
 {
     public partial class Form1 : Form
     {
-        string[] arrey = new string[100];
-        int round = 0;
-        int checkround = 0;
-        int sleep = 1000;
-        Random random = new Random();
-        Button button;
-        Color color;
-        string goodResult = null;
+        readonly string[] arrey = new string[100];  // 
+        int score = 0;                              // 
+        int checkround = 0;                         // 
+        readonly int sleep = 1000;                  // 
+        readonly Random random = new Random();
+        Button button;                              // 
+        Color color;                                // 
 
         public Form1()
         {
             InitializeComponent();
         }
 
+        // Exit app
         private void btnExit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
+        // Start new game
         private void btnNewGame_Click(object sender, EventArgs e)
         {
             btnNewGame.Enabled = false;
-            round = 0;
+            score = 0;
             checkround = 0;
             GameLoop();
         }
@@ -149,21 +151,12 @@ namespace GameSimon
             }
         }
 
-        void GetGoodString()
-        {
-            goodResult = "";
-            for (int i = 0; i <= round; ++i)
-            {
-                goodResult += arrey[i] + " ";
-            }
-        }
-
         void GameLoop()
         {
             Thread.Sleep(sleep);
             checkround = 0;
-            lblRound.Text = "Round: " + (round + 1).ToString();
-            for (int i = 0; i <= round; i++)
+            lblRound.Text = "Round: " + (score + 1).ToString();
+            for (int i = 0; i <= score; i++)
             {
                 int temp = random.Next(0, 4);
                 arrey[i] = ConvertColor(temp);
@@ -180,23 +173,22 @@ namespace GameSimon
 
         void Check(string tag)
         {
-            if (checkround == round)
+            if (checkround == score)
             {
                 if (arrey[checkround] != tag)
                 {
-                    GameOver(checkround);
+                    GameOver(score);
                     return;
                 }
 
-                GetGoodString();
-                round++;
+                score++;
                 GameLoop();
             }
             else
             {
                 if (arrey[checkround] != tag)
                 {
-                    GameOver(checkround);
+                    GameOver(score);
                     return;
                 }
 
@@ -206,10 +198,76 @@ namespace GameSimon
 
         private void GameOver(int maxCheck)
         {
+            string text = "Maximum sequence: " + maxCheck;
+            MessageBox.Show(text, "Result the game");
+
+            if (!File.Exists("record.txt"))
+            {
+                Name nameForm = new Name();
+                nameForm.ShowDialog(this);
+                string name = nameForm.textBox.Text;
+
+                using (StreamWriter sw = new StreamWriter("record.txt"))
+                {
+                    string newLine = string.Format("{0};{1}", maxCheck, name);
+                    sw.WriteLine(newLine);
+                }
+            }
+            else
+            {
+                string allLines = null;
+
+                using (StreamReader sr = new StreamReader("record.txt"))
+                {
+                    string line1 = sr.ReadLine();
+                    string[] arrey = line1.Split(';');
+                    if (Convert.ToInt32(arrey[0]) < maxCheck)
+                    {
+                        Name nameForm = new Name();
+                        nameForm.ShowDialog(this);
+                        string name = nameForm.textBox.Text;
+
+                        string newLine = string.Format("{0};{1}", maxCheck, name);
+                        allLines = newLine + "\r\n" + line1 + "\r\n" + sr.ReadToEnd();
+                    }
+                }
+
+                using (StreamWriter sw = new StreamWriter("record.txt", false))
+                {
+                    sw.WriteLine(allLines);
+                }
+            }
+
+            ViewRecords();
             btnNewGame.Enabled = true;
             DisabledButtons();
-            string text = "Maximum sequence: " + goodResult.Trim();
-            MessageBox.Show(text, "Result the game");
+        }
+
+        private void btnRecords_Click(object sender, EventArgs e)
+        {
+            ViewRecords();
+        }
+
+        private static void ViewRecords()
+        {
+            using (StreamReader sr = new StreamReader("record.txt"))
+            {
+                string text = string.Format("{0:15}\t{1}", "Name", "Score");
+                text += "\r\n";
+
+                while (sr.Peek() >= 0)
+                {
+                    string line = sr.ReadLine();
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        string[] arrey = line.Split(';');
+
+                        text += "\r\n";
+                        text += string.Format("{0:15}\t{1}", arrey[1], arrey[0]);
+                    }
+                }
+                MessageBox.Show(text, "Records the game");
+            }
         }
     }
 }

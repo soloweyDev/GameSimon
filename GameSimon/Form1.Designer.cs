@@ -108,6 +108,7 @@
             this.btnRecords.TabIndex = 5;
             this.btnRecords.Text = "Records";
             this.btnRecords.UseVisualStyleBackColor = true;
+            this.btnRecords.Click += new System.EventHandler(this.btnRecords_Click);
             // 
             // btnExit
             // 
@@ -143,6 +144,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Simon";
             this.ResumeLayout(false);
             this.PerformLayout();
