@@ -14,6 +14,7 @@ namespace GameSimon
         Random random = new Random();
         Button button;
         Color color;
+        string goodResult = null;
 
         public Form1()
         {
@@ -28,46 +29,57 @@ namespace GameSimon
         private void btnNewGame_Click(object sender, EventArgs e)
         {
             btnNewGame.Enabled = false;
-            round = 5;
+            round = 0;
             checkround = 0;
             GameLoop();
         }
 
+        private void btnRed_MouseDown(object sender, MouseEventArgs e)
+        {
+            btnRed.BackColor = Color.Red;
+        }
+
+        private void btnGreen_MouseDown(object sender, MouseEventArgs e)
+        {
+            btnGreen.BackColor = Color.Lime;
+        }
+
+        private void btnBlue_MouseDown(object sender, MouseEventArgs e)
+        {
+            btnBlue.BackColor = Color.Blue;
+        }
+
+        private void btnYellow_MouseDown(object sender, MouseEventArgs e)
+        {
+            btnYellow.BackColor = Color.Yellow;
+        }
+
         private void btnRed_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Click");
+            btnRed.BackColor = Color.DarkRed;
+            Refresh();
+            Check(btnRed.Tag.ToString());
         }
 
         private void btnGreen_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Click");
+            btnGreen.BackColor = Color.DarkGreen;
+            Refresh();
+            Check(btnGreen.Tag.ToString());
         }
 
         private void btnBlue_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Click");
+            btnBlue.BackColor = Color.DarkBlue;
+            Refresh();
+            Check(btnBlue.Tag.ToString());
         }
 
         private void btnYellow_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Click");
-        }
-
-        void GameLoop()
-        {
-            lblRound.Text = "Round: " + (round + 1).ToString();
-            for (int i = 0; i <= round; i++)
-            {
-                int temp = random.Next(0, 4);
-                arrey[i] = ConvertColor(temp);
-                button.BackColor = color;
-                Refresh();
-                Thread.Sleep(sleep);
-                ConvertColor(temp + 5);
-                button.BackColor = color;
-                Refresh();
-            }
-            EnabledButtons();
+            btnYellow.BackColor = Color.Gold;
+            Refresh();
+            Check(btnYellow.Tag.ToString());
         }
 
         void EnabledButtons()
@@ -97,7 +109,7 @@ namespace GameSimon
 
                 case 1:
                     button = btnGreen;
-                    color = Color.Green;
+                    color = Color.Lime;
                     return "Green";
 
                 case 2:
@@ -137,20 +149,67 @@ namespace GameSimon
             }
         }
 
+        void GetGoodString()
+        {
+            goodResult = "";
+            for (int i = 0; i <= round; ++i)
+            {
+                goodResult += arrey[i] + " ";
+            }
+        }
+
+        void GameLoop()
+        {
+            Thread.Sleep(sleep);
+            checkround = 0;
+            lblRound.Text = "Round: " + (round + 1).ToString();
+            for (int i = 0; i <= round; i++)
+            {
+                int temp = random.Next(0, 4);
+                arrey[i] = ConvertColor(temp);
+                button.BackColor = color;
+                Refresh();
+                Thread.Sleep(sleep);
+                ConvertColor(temp + 5);
+                button.BackColor = color;
+                Refresh();
+                Thread.Sleep(sleep);
+            }
+            EnabledButtons();
+        }
+
         void Check(string tag)
         {
             if (checkround == round)
             {
-                if (arrey[checkround] == tag)
+                if (arrey[checkround] != tag)
                 {
-                    GameLoop();
+                    GameOver(checkround);
+                    return;
                 }
-                else
-                {
-                    string text = "";
-                    MessageBox.Show("Result the game", text);
-                }
+
+                GetGoodString();
+                round++;
+                GameLoop();
             }
+            else
+            {
+                if (arrey[checkround] != tag)
+                {
+                    GameOver(checkround);
+                    return;
+                }
+
+                checkround++;
+            }
+        }
+
+        private void GameOver(int maxCheck)
+        {
+            btnNewGame.Enabled = true;
+            DisabledButtons();
+            string text = "Maximum sequence: " + goodResult.Trim();
+            MessageBox.Show(text, "Result the game");
         }
     }
 }

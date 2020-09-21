@@ -49,6 +49,7 @@
             this.btnRed.Tag = "Red";
             this.btnRed.UseVisualStyleBackColor = false;
             this.btnRed.Click += new System.EventHandler(this.btnRed_Click);
+            this.btnRed.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnRed_MouseDown);
             // 
             // btnGreen
             // 
@@ -61,6 +62,7 @@
             this.btnGreen.Tag = "Green";
             this.btnGreen.UseVisualStyleBackColor = false;
             this.btnGreen.Click += new System.EventHandler(this.btnGreen_Click);
+            this.btnGreen.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnGreen_MouseDown);
             // 
             // btnYellow
             // 
@@ -73,6 +75,7 @@
             this.btnYellow.Tag = "Yellow";
             this.btnYellow.UseVisualStyleBackColor = false;
             this.btnYellow.Click += new System.EventHandler(this.btnYellow_Click);
+            this.btnYellow.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnYellow_MouseDown);
             // 
             // btnBlue
             // 
@@ -85,6 +88,7 @@
             this.btnBlue.Tag = "Blue";
             this.btnBlue.UseVisualStyleBackColor = false;
             this.btnBlue.Click += new System.EventHandler(this.btnBlue_Click);
+            this.btnBlue.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnBlue_MouseDown);
             // 
             // btnNewGame
             // 
