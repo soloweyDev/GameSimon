@@ -248,7 +248,7 @@ namespace GameSimon
                 // Saving to the record's file
                 using (StreamWriter sw = new StreamWriter("record.txt"))
                 {
-                    string newLine = string.Format("{0};{1}", maxCheck, name);
+                    string newLine = string.Format("{0};{1}", maxCheck, name != "" ? name : "noname");
                     sw.WriteLine(newLine);
                 }
             }
@@ -260,22 +260,36 @@ namespace GameSimon
                 {
                     // The best results are at the beginning of the file. Therefore, we only read the first line.
                     string line1 = sr.ReadLine();
-                    // We get the array by separator. The first value is the maximum score, the second is the name.
-                    string[] arrey = line1.Split(';');
-                    // Checking whether the current result will be a new record
-                    if (Convert.ToInt32(arrey[0]) < maxCheck)
+                    if (string.IsNullOrEmpty(line1))
                     {
-                        // New record!! GOOD!!!
-
                         // Create the new form for input the player's name
                         Name nameForm = new Name();
                         nameForm.ShowDialog(this);
                         // Passing the player's name from the forms to the variable
                         string name = nameForm.textBox.Text;
 
-                        // Create a line to which we add all the records
-                        string newLine = string.Format("{0};{1}", maxCheck, name);
-                        allLines = newLine + "\r\n" + line1 + "\r\n" + sr.ReadToEnd();
+                        // Create a line the records
+                        allLines = string.Format("{0};{1}", maxCheck, name != "" ? name : "noname");
+                    }
+                    else
+                    {
+                        // We get the array by separator. The first value is the maximum score, the second is the name.
+                        string[] arrey = line1.Split(';');
+                        // Checking whether the current result will be a new record
+                        if (Convert.ToInt32(arrey[0]) < maxCheck)
+                        {
+                            // New record!! GOOD!!!
+
+                            // Create the new form for input the player's name
+                            Name nameForm = new Name();
+                            nameForm.ShowDialog(this);
+                            // Passing the player's name from the forms to the variable
+                            string name = nameForm.textBox.Text;
+
+                            // Create a line to which we add all the records
+                            string newLine = string.Format("{0};{1}", maxCheck, name != "" ? name : "noname");
+                            allLines = newLine + "\r\n" + line1 + "\r\n" + sr.ReadToEnd();
+                        }
                     }
                 }
 
@@ -296,24 +310,28 @@ namespace GameSimon
         // Displaying a list of records
         private static void ViewRecords()
         {
-            using (StreamReader sr = new StreamReader("record.txt"))
+            string text = string.Format("{0,-20}\t{1}", "Name", "Score");
+            text += "\r\n";
+
+            if (File.Exists("record.txt"))
             {
-                string text = string.Format("{0:15}\t{1}", "Name", "Score");
-                text += "\r\n";
-
-                while (sr.Peek() >= 0)
+                using (StreamReader sr = new StreamReader("record.txt"))
                 {
-                    string line = sr.ReadLine();
-                    if (!string.IsNullOrEmpty(line))
+                    while (sr.Peek() >= 0)
                     {
-                        string[] arrey = line.Split(';');
+                        string line = sr.ReadLine();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            string[] arrey = line.Split(';');
 
-                        text += "\r\n";
-                        text += string.Format("{0:15}\t{1}", arrey[1], arrey[0]);
+                            text += "\r\n";
+                            text += string.Format("{0,-20}\t{1}", arrey[1], arrey[0]);
+                        }
                     }
                 }
-                MessageBox.Show(text, "Records the game");
             }
+
+            MessageBox.Show(text, "Records the game");
         }
     }
 }
